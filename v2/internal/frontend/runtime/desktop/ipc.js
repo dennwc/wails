@@ -24,8 +24,9 @@ The electron alternative for Go
 	};
 	let windows = _deeptest(["chrome", "webview", "postMessage"]);
 	let mac_linux = _deeptest(["webkit", "messageHandlers", "external", "postMessage"]);
+	let android = _deeptest(["wailsdroid", "postMessage"]);
 
-	if (!windows && !mac_linux) {
+	if (!windows && !mac_linux && !android) {
 		console.error("Unsupported Platform");
 		return;
 	}
@@ -35,5 +36,8 @@ The electron alternative for Go
 	}
 	if (mac_linux) {
 		window.WailsInvoke = (message) => window.webkit.messageHandlers.external.postMessage(message);
+	}
+	if (android) {
+		window.WailsInvoke = (message) => window.wailsdroid.postMessage(message);
 	}
 })();
