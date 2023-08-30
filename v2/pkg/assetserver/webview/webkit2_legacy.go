@@ -1,4 +1,4 @@
-//go:build linux && !(webkit2_36 || webkit2_40)
+//go:build linux && !android && !(webkit2_36 || webkit2_40)
 
 package webview
 

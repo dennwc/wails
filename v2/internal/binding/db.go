@@ -3,6 +3,7 @@ package binding
 import (
 	"encoding/json"
 	"sort"
+	"strings"
 	"sync"
 	"unsafe"
 )
@@ -73,7 +74,7 @@ func (d *DB) GetObfuscatedMethod(id int) *BoundMethod {
 // AddMethod adds the given method definition to the db using the given qualified path: packageName.structName.methodName
 func (d *DB) AddMethod(packageName string, structName string, methodName string, methodDefinition *BoundMethod) {
 
-	if packageName == "notmain" {
+	if packageName == "notmain" || packageName == "webapp" || strings.HasSuffix(packageName, "webapp") {
 		// hack: also bind as main for android
 		d.AddMethod("main", structName, methodName, methodDefinition)
 	}

@@ -13,8 +13,9 @@ import (
 
 	"github.com/wailsapp/wails/v2/internal/binding"
 	"github.com/wailsapp/wails/v2/internal/frontend"
-	"github.com/wailsapp/wails/v2/internal/frontend/assetserver"
+	wailsruntime "github.com/wailsapp/wails/v2/internal/frontend/runtime"
 	"github.com/wailsapp/wails/v2/internal/logger"
+	"github.com/wailsapp/wails/v2/pkg/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	android "github.com/wailsapp/wails/v2/pkg/wailsdroid"
 )
@@ -71,7 +72,7 @@ func NewFrontend(ctx context.Context, appoptions *options.App, myLogger *logger.
 			log.Fatal(err)
 		}
 
-		assets, err := assetserver.NewAssetServer(ctx, appoptions, bindingsJSON)
+		assets, err := assetserver.NewAssetServerMainPage(bindingsJSON, appoptions, ctx.Value("assetdir") != nil, myLogger, wailsruntime.RuntimeAssetsBundle)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -158,9 +159,7 @@ func (f *Frontend) startRequestProcessor() {
 func (f *Frontend) processRequest(request *android.ThreadSafeIntercept) {
 	rw := &portalResponseWriter{request: request}
 	defer rw.Close()
-
-	f.assets.ProcessHTTPRequest(
-		request.Request.URL,
+	f.assets.ProcessHTTPRequestLegacy(
 		rw,
 		func() (*http.Request, error) {
 			req, err := http.NewRequest(http.MethodGet, request.Request.URL, nil)
@@ -196,6 +195,10 @@ func (f *Frontend) Run(ctx context.Context) error {
 	return nil
 }
 
+func (f *Frontend) RunMainLoop() {
+	//select {}
+}
+
 func (f *Frontend) Hide() {
 	f.mainWindow.Hide()
 }
@@ -206,6 +209,10 @@ func (f *Frontend) Show() {
 
 func (f *Frontend) Quit() {
 	f.mainWindow.Quit()
+}
+
+func (f *Frontend) WindowClose() {
+	//f.mainWindow.Quit()
 }
 
 type EventNotify struct {
